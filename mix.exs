@@ -7,7 +7,8 @@ defmodule Mnemonics.Mixfile do
       version: "0.1.0",
       elixir: "~> 1.5",
       start_permanent: Mix.env == :prod,
-      deps: deps()
+      deps: deps(),
+      elixirc_paths: elixirc_paths(Mix.env),
     ]
   end
 
@@ -23,4 +24,7 @@ defmodule Mnemonics.Mixfile do
       {:inner_cotton, github: "ne-sachirou/inner_cotton", only: [:dev, :test], runtime: false},
     ]
   end
+
+  defp elixirc_paths(:test), do: ["lib", "test/support"]
+  defp elixirc_paths(_), do: ["lib"]
 end
