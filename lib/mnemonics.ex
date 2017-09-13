@@ -2,40 +2,28 @@ defmodule Mnemonics do
   @moduledoc """
   """
 
-  alias Mnemonics.Repo
-
-  @doc """
-  """
-  @spec reload :: any
-  def reload do
-    for {table_name, memory} <- GenServer.call(Mnemonics.Repo, :tables) do
-      GenServer.call memory, :stop
-      Repo.load_table table_name
-    end
-  end
-
-  @doc """
-  """
-  @spec reload([atom] | atom) :: any
-  def reload(table_names) when is_list(table_names) do
-    for {table_name, memory} <- GenServer.call(Mnemonics.Repo, :tables), table_name in table_names do
-      GenServer.call memory, :stop
-      Repo.load_table table_name
-    end
-  end
-  def reload(table_name), do: reload [table_name]
-
   defmacro __using__(table_name: table_name) do
     quote do
       @doc """
       """
-      @spec load :: any
-      def load, do: Mnemonics.Repo.load_table unquote table_name
+      @spec load(non_neg_integer) :: :ok | {:error, term}
+      def load(version), do: GenServer.call Mnemonics.Repo, {:load_table, unquote(table_name), version}
 
       @doc """
       """
       @spec table_name :: atom
-      def table_name, do: unquote table_name
+      def table_name do
+        {_, version, _} = Mnemonics.Repo
+          |> GenServer.call(:tables)
+          |> Enum.filter(&(elem(&1, 0) == unquote(table_name)))
+          |> Enum.max_by(&elem(&1, 1))
+        table_name version
+      end
+
+      @doc """
+      """
+      @spec table_name(non_neg_integer) :: atom
+      def table_name(version), do: Mnemonics.Repo.table_name(unquote(table_name), version)
     end
   end
 end

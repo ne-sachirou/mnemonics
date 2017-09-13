@@ -1,16 +1,15 @@
 defmodule Mnemonics.Reservoir do
   @moduledoc """
+  Supervise Mnemonics.Memory
   """
 
   use Supervisor
 
-  @doc """
-  """
+  @doc false
   @spec start_link(term) :: Supervisor.on_start
   def start_link(arg), do: Supervisor.start_link __MODULE__, arg, name: __MODULE__
 
-  @doc """
-  """
+  @doc false
   @spec init([term]) :: {:ok, {:supervisor.sup_flags, [:supervisor.child_spec]}}
   def init(_arg) do
     Supervisor.init [

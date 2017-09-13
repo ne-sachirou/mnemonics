@@ -1,5 +1,5 @@
 /docs/
-/test/examples.ets
+/test/*.ets
 
 
 # The directory Mix will write compiled artifacts to.
