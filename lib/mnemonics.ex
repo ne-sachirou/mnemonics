@@ -13,8 +13,7 @@ defmodule Mnemonics do
       """
       @spec table_name :: atom
       def table_name do
-        {_, %{tid: tid}} = Mnemonics.Repo
-          |> GenServer.call(:tables)
+        {_, %{tid: tid}} = Mnemonics.Repo.tables
           |> Enum.filter(&(elem(&1, 1).table_name == unquote(table_name)))
           |> Enum.max_by(&elem(&1, 1).version)
         tid
@@ -24,9 +23,9 @@ defmodule Mnemonics do
       """
       @spec table_name(non_neg_integer) :: atom
       def table_name(version) do
-        {_, %{tid: tid}} = Mnemonics.Repo
-          |> GenServer.call(:tables)
-          |> Enum.find(fn {_, memory} -> memory.table_name == unquote(table_name) and memory.version == version end)
+        {_, %{tid: tid}} = Enum.find Mnemonics.Repo.tables, fn {_, memory} ->
+          memory.table_name == unquote(table_name) and memory.version == version
+        end
         tid
       end
     end

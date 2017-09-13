@@ -21,7 +21,7 @@ defmodule MnemonicsTest do
         end
       """
       :ok = ExampleLoad1.load 1
-      assert Enum.any? GenServer.call(Repo, :tables), &match?({_, %Memory{table_name: ^table_name, version: 1}}, &1)
+      assert Enum.any? Repo.tables, &match?({_, %Memory{table_name: ^table_name, version: 1}}, &1)
       assert [{1, %Example{id: 1, name: "1"}}] == :ets.lookup ExampleLoad1.table_name(1), 1
     end
 
@@ -37,9 +37,9 @@ defmodule MnemonicsTest do
       table_name_1 = ExampleLoad2.table_name 1
       :ok = ExampleLoad2.load 2
       :ok = ExampleLoad2.load 3
-      refute Enum.any? GenServer.call(Repo, :tables), &match?({_, %Memory{table_name: ^table_name, version: 1}}, &1)
-      assert Enum.any? GenServer.call(Repo, :tables), &match?({_, %Memory{table_name: ^table_name, version: 2}}, &1)
-      assert Enum.any? GenServer.call(Repo, :tables), &match?({_, %Memory{table_name: ^table_name, version: 3}}, &1)
+      refute Enum.any? Repo.tables, &match?({_, %Memory{table_name: ^table_name, version: 1}}, &1)
+      assert Enum.any? Repo.tables, &match?({_, %Memory{table_name: ^table_name, version: 2}}, &1)
+      assert Enum.any? Repo.tables, &match?({_, %Memory{table_name: ^table_name, version: 3}}, &1)
       assert :undefined == :ets.info table_name_1
       refute table_name_1 in :ets.all
       assert [{1, %Example{id: 1, name: "1"}}] == :ets.lookup ExampleLoad2.table_name(2), 1
@@ -59,7 +59,7 @@ defmodule MnemonicsTest do
       :ok = ExampleLoad3.load 1
       table_name_1_2 = ExampleLoad3.table_name 1
       refute table_name_1_1 == table_name_1_2
-      assert Enum.any? GenServer.call(Repo, :tables), &match?({_, %Memory{table_name: ^table_name, version: 1}}, &1)
+      assert Enum.any? Repo.tables, &match?({_, %Memory{table_name: ^table_name, version: 1}}, &1)
       assert [{1, %Example{id: 1, name: "1"}}] == :ets.lookup ExampleLoad3.table_name(1), 1
     end
   end

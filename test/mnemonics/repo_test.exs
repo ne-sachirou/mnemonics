@@ -6,9 +6,9 @@ defmodule Mnemonics.RepoTest do
 
   doctest Repo
 
-  describe "handle_call(:tables)/3" do
+  describe "tables/0" do
     test "Get the list of tables." do
-      assert Enum.any? GenServer.call(Repo, :tables), &match?({_, %Memory{table_name: :examples}}, &1)
+      assert Enum.any? Repo.tables, &match?({_, %Memory{table_name: :examples}}, &1)
     end
   end
 end

@@ -3,6 +3,7 @@ defmodule Mnemonics.Repo do
   """
 
   alias Mnemonics.Memory
+  alias Mnemonics.Repo
 
   use GenServer
 
@@ -23,6 +24,9 @@ defmodule Mnemonics.Repo do
   """
   @spec init(term) :: {:ok, t}
   def init(_arg), do: {:ok, %__MODULE__{}}
+
+  @spec tables :: [{pid, Memory.t}]
+  def tables, do: GenServer.call Repo, :tables
 
   @doc """
   """
@@ -59,6 +63,6 @@ defmodule Mnemonics.Repo do
 
   @doc """
   """
-  @spec handle_call(:tables, GenServer.from, t) :: {:reply, [{atom, non_neg_integer, pid}], t}
+  @spec handle_call(:tables, GenServer.from, t) :: {:reply, [{pid, Memory.t}], t}
   def handle_call(:tables, _from, %{tables: tables} = state), do: {:reply, tables, state}
 end
