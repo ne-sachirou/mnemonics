@@ -9,18 +9,23 @@ defmodule Mnemonics.MemoryTest do
   describe "init/1" do
     test "Start an ETS." do
       Example.create_example_ets :examples_init_1
-      Memory.init table_name: :examples_init_1, version: 1
-      assert :"examples_init_1:1" in :ets.all
+      assert {:ok, %Memory{table_name: :examples_init_1, version: 1} = memory} =
+        Memory.init table_name: :examples_init_1, version: 1
+      refute :undefined == :ets.info memory.tid
+      assert memory.tid in :ets.all
     end
   end
 
   describe "handle_call(:stop)/3" do
     test "Stop the ETS." do
       Example.create_example_ets :examples_stop_1
-      Memory.init table_name: :examples_stop_1, version: 1
-      assert :"examples_stop_1:1" in :ets.all
-      Memory.handle_call :stop, self(), %Memory{table_name: :examples_stop_1, version: 1}
-      refute :"examples_stop_1:1" in :ets.all
+      assert {:ok, %Memory{table_name: :examples_stop_1, version: 1} = memory} =
+        Memory.init table_name: :examples_stop_1, version: 1
+      refute :undefined == :ets.info memory.tid
+      assert memory.tid in :ets.all
+      Memory.handle_call :stop, self(), memory
+      assert :undefined == :ets.info memory.tid
+      refute memory.tid in :ets.all
     end
   end
 end

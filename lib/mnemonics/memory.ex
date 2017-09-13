@@ -7,11 +7,12 @@ defmodule Mnemonics.Memory do
   use GenServer
 
   @type t :: %{
+    tid: :ets.tid,
     table_name: atom,
     version: non_neg_integer,
   }
 
-  defstruct table_name: nil, version: 0
+  defstruct tid: nil, table_name: nil, version: 0
 
   @doc """
   """
@@ -26,9 +27,7 @@ defmodule Mnemonics.Memory do
            |> Path.join
            |> String.to_charlist
            |> :ets.file2tab do
-      {:ok, table} ->
-        :ets.rename table, Repo.table_name(table_name, version)
-        {:ok, %__MODULE__{table_name: table_name, version: version}}
+      {:ok, table} -> {:ok, %__MODULE__{tid: table, table_name: table_name, version: version}}
       {:error, reason} -> {:stop, reason}
     end
   end
@@ -40,9 +39,14 @@ defmodule Mnemonics.Memory do
 
   @doc """
   """
+  @spec handle_call(:state, GenServer.from, t) :: {:reply, t, t}
+  def handle_call(:state, _from, t), do: {:reply, t, t}
+
+  @doc """
+  """
   @spec handle_call(:stop, GenServer.from, t) :: {:stop, :normal, t}
   def handle_call(:stop, _from, state) do
-    :ets.delete Repo.table_name(state.table_name, state.version)
+    :ets.delete state.tid
     {:stop, :normal, state}
   end
 end

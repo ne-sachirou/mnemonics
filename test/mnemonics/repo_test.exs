@@ -1,4 +1,5 @@
 defmodule Mnemonics.RepoTest do
+  alias Mnemonics.Memory
   alias Mnemonics.Repo
 
   use ExUnit.Case
@@ -7,7 +8,7 @@ defmodule Mnemonics.RepoTest do
 
   describe "handle_call(:tables)/3" do
     test "Get the list of tables." do
-      assert Enum.any? GenServer.call(Repo, :tables), &match?({:examples, 1, _}, &1)
+      assert Enum.any? GenServer.call(Repo, :tables), &match?({_, %Memory{table_name: :examples}}, &1)
     end
   end
 end
