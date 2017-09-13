@@ -21,6 +21,7 @@ defmodule Mnemonics.Mixfile do
 
   defp deps do
     [
+      {:fastglobal, "~> 1.0"},
       {:inner_cotton, github: "ne-sachirou/inner_cotton", only: [:dev, :test], runtime: false},
     ]
   end

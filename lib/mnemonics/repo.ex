@@ -3,7 +3,6 @@ defmodule Mnemonics.Repo do
   """
 
   alias Mnemonics.Memory
-  alias Mnemonics.Repo
 
   use GenServer
 
@@ -11,6 +10,7 @@ defmodule Mnemonics.Repo do
     tables: [{pid, Memory.t}]
   }
 
+  @global_tables_key FastGlobal.new :"#{__MODULE__}.Tables}"
   @living_versions 2
 
   defstruct tables: []
@@ -23,10 +23,13 @@ defmodule Mnemonics.Repo do
   @doc """
   """
   @spec init(term) :: {:ok, t}
-  def init(_arg), do: {:ok, %__MODULE__{}}
+  def init(_arg) do
+    FastGlobal.put @global_tables_key, []
+    {:ok, %__MODULE__{}}
+  end
 
   @spec tables :: [{pid, Memory.t}]
-  def tables, do: GenServer.call Repo, :tables
+  def tables, do: @global_tables_key |> FastGlobal.get([]) |> Enum.map(&:erlang.binary_to_term/1)
 
   @doc """
   """
@@ -56,13 +59,10 @@ defmodule Mnemonics.Repo do
       {:ok, memory_pid} ->
         memory = GenServer.call memory_pid, :state
         state = put_in state.tables, [{memory_pid, memory} | existing_tables ++ rest_tables]
+        # NOTE: FastGlobal can't put pid & reference.
+        FastGlobal.put @global_tables_key, Enum.map(state.tables, &:erlang.term_to_binary/1)
         {:reply, :ok, state}
       {:error, reason} -> {:reply, {:error, reason}, state}
     end
   end
-
-  @doc """
-  """
-  @spec handle_call(:tables, GenServer.from, t) :: {:reply, [{pid, Memory.t}], t}
-  def handle_call(:tables, _from, %{tables: tables} = state), do: {:reply, tables, state}
 end
