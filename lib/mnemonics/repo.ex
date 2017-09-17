@@ -12,7 +12,10 @@ defmodule Mnemonics.Repo do
     tables: [table]
   }
 
+  @global_tables_default_value :erlang.term_to_binary []
+
   @global_tables_key FastGlobal.new :"#{__MODULE__}.Tables}"
+
   @living_versions 2
 
   defstruct tables: []
@@ -26,12 +29,12 @@ defmodule Mnemonics.Repo do
   """
   @spec init(term) :: {:ok, t}
   def init(_arg) do
-    FastGlobal.put @global_tables_key, []
+    FastGlobal.put @global_tables_key, @global_tables_default_value
     {:ok, %__MODULE__{}}
   end
 
   @spec tables :: [table]
-  def tables, do: @global_tables_key |> FastGlobal.get([]) |> Enum.map(&:erlang.binary_to_term/1)
+  def tables, do: @global_tables_key |> FastGlobal.get(@global_tables_default_value) |> :erlang.binary_to_term
 
   @doc """
   """
@@ -43,7 +46,7 @@ defmodule Mnemonics.Repo do
         memory = GenServer.call memory_pid, :state
         state = put_in state.tables, [{memory_pid, memory} | tables]
         # NOTE: FastGlobal can't put pid & reference.
-        FastGlobal.put @global_tables_key, Enum.map(state.tables, &:erlang.term_to_binary/1)
+        FastGlobal.put @global_tables_key, :erlang.term_to_binary(state.tables)
         for {memory_pid, _} <- old_tables do
           try do
             GenServer.call memory_pid, :stop

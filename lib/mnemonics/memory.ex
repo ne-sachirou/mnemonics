@@ -2,8 +2,6 @@ defmodule Mnemonics.Memory do
   @moduledoc """
   """
 
-  alias Mnemonics.Repo
-
   use GenServer
 
   @type t :: %{
