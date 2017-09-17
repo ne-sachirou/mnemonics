@@ -4,11 +4,21 @@ defmodule Mnemonics.Mixfile do
   def project do
     [
       app: :mnemonics,
-      version: "0.1.0",
-      elixir: "~> 1.5",
-      start_permanent: Mix.env == :prod,
       deps: deps(),
+      description: "Read only data store for Elixir: fast, concurrently, for large data & hot reloadable.",
+      elixir: "~> 1.5",
       elixirc_paths: elixirc_paths(Mix.env),
+      package: package(),
+      start_permanent: Mix.env == :prod,
+      version: "0.1.0",
+
+      # Docs
+      docs: [
+        main: "readme",
+        extras: ["README.md"],
+      ],
+      homepage_url: "https://github.com/ne-sachirou/mnemonics",
+      name: "Mnemonics",
     ]
   end
 
@@ -21,6 +31,7 @@ defmodule Mnemonics.Mixfile do
 
   defp deps do
     [
+      {:ex_doc, "~> 0.16", only: :dev, runtime: false},
       {:fastglobal, "~> 1.0"},
       {:inner_cotton, github: "ne-sachirou/inner_cotton", only: [:dev, :test], runtime: false},
     ]
@@ -28,4 +39,16 @@ defmodule Mnemonics.Mixfile do
 
   defp elixirc_paths(:test), do: ["lib", "test/support"]
   defp elixirc_paths(_), do: ["lib"]
+
+  def package do
+    [
+      files: ["LICENSE", "README.md", "mix.exs", "lib"],
+      licenses: ["GPL-3.0"],
+      links: %{
+        "GitHub": "https://github.com/ne-sachirou/mnemonics",
+      },
+      name: :mnemonics,
+      maintainers: ["ne_Sachirou <utakata.c4se@gmail.com>"],
+    ]
+  end
 end

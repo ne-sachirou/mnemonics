@@ -1,5 +1,6 @@
 defmodule Mnemonics.Memory do
   @moduledoc """
+  Own an ETS.
   """
 
   use GenServer
@@ -12,8 +13,7 @@ defmodule Mnemonics.Memory do
 
   defstruct tid: nil, table_name: nil, version: 0
 
-  @doc """
-  """
+  @doc false
   @spec start_link(any, term) :: GenServer.on_start
   def start_link(_, arg), do: GenServer.start_link __MODULE__, arg
 
@@ -30,18 +30,18 @@ defmodule Mnemonics.Memory do
     end
   end
 
-  @doc """
-  """
+  @doc false
   @spec terminate(:normal | :shutdown | {:shutdown, term} | term, t) :: term
-  def ternimate(_reason, _state), do: :ok
+  def terminate(_reason, _state), do: :ok
 
   @doc """
+  `:state` => Reply the state.
+
+  `:stop` => Delete the ETS & stop.
   """
   @spec handle_call(:state, GenServer.from, t) :: {:reply, t, t}
   def handle_call(:state, _from, t), do: {:reply, t, t}
 
-  @doc """
-  """
   @spec handle_call(:stop, GenServer.from, t) :: {:stop, :normal, t}
   def handle_call(:stop, _from, state) do
     :ets.delete state.tid

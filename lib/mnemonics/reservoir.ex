@@ -1,6 +1,6 @@
 defmodule Mnemonics.Reservoir do
   @moduledoc """
-  Supervise Mnemonics.Memory
+  Supervise `Mnemonics.Memory`.
   """
 
   use Supervisor

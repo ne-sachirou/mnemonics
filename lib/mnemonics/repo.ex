@@ -1,5 +1,6 @@
 defmodule Mnemonics.Repo do
   @moduledoc """
+  Orchestrate `Mnemonics.Memory`.
   """
 
   alias Mnemonics.Memory
@@ -20,23 +21,25 @@ defmodule Mnemonics.Repo do
 
   defstruct tables: []
 
-  @doc """
-  """
+  @doc false
   @spec start_link(term) :: GenServer.on_start
   def start_link(arg), do: GenServer.start_link __MODULE__, arg, name: __MODULE__
 
-  @doc """
-  """
+  @doc false
   @spec init(term) :: {:ok, t}
   def init(_arg) do
     FastGlobal.put @global_tables_key, @global_tables_default_value
     {:ok, %__MODULE__{}}
   end
 
+  @doc """
+  All living tables.
+  """
   @spec tables :: [table]
   def tables, do: @global_tables_key |> FastGlobal.get(@global_tables_default_value) |> :erlang.binary_to_term
 
   @doc """
+  `:load_table` => Load a table of the table_name & version, then stop old ones.
   """
   @spec handle_call({:load_table, atom, non_neg_integer}, GenServer.from, t) :: {:reply, :ok | {:error, term}, t}
   def handle_call({:load_table, table_name, version}, _from, state) do

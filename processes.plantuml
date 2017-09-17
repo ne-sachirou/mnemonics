@@ -1,0 +1,39 @@
+@startuml
+
+object "Mnemonics.Application" as Application
+object "Mnemonics.Repo" as Repo {
+  tables = "[{memory1, 2, tid2}, {memory2, 1, tid3}]"
+}
+object "Mnemonics.Reservoir" as Reservoir
+object "Mnemonics.Memory" as memory1_1 {
+  table_name = memory1
+  version = 1
+}
+object "ETS" as memory1_1_ets {
+  tid = tid1
+}
+object "Mnemonics.Memory" as memory1_2 {
+  table_name = memory1
+  version = 2
+}
+object "ETS" as memory1_2_ets {
+  tid = tid2
+}
+object "Mnemonics.Memory" as memory2_1 {
+  table_name = memory2
+  version = 1
+}
+object "ETS" as memory2_1_ets {
+  tid = tid3
+}
+
+Application <|-- Repo
+Application <|-- Reservoir
+Reservoir <|-- memory1_1
+memory1_1 <|-- memory1_1_ets
+Reservoir <|-- memory1_2
+memory1_2 <|-- memory1_2_ets
+Reservoir <|-- memory2_1
+memory2_1 <|-- memory2_1_ets
+
+@enduml
