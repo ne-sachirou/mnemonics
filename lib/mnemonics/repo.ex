@@ -6,8 +6,10 @@ defmodule Mnemonics.Repo do
 
   use GenServer
 
+  @type table :: {pid, Memory.t}
+
   @type t :: %__MODULE__{
-    tables: [{pid, Memory.t}]
+    tables: [table]
   }
 
   @global_tables_key FastGlobal.new :"#{__MODULE__}.Tables}"
@@ -28,14 +30,35 @@ defmodule Mnemonics.Repo do
     {:ok, %__MODULE__{}}
   end
 
-  @spec tables :: [{pid, Memory.t}]
+  @spec tables :: [table]
   def tables, do: @global_tables_key |> FastGlobal.get([]) |> Enum.map(&:erlang.binary_to_term/1)
 
   @doc """
   """
   @spec handle_call({:load_table, atom, non_neg_integer}, GenServer.from, t) :: {:reply, :ok | {:error, term}, t}
   def handle_call({:load_table, table_name, version}, _from, state) do
-    {existing_tables, old_tables, rest_tables} = state.tables
+    {old_tables, tables} = pop_old_tables state.tables, table_name, version
+    case Supervisor.start_child Mnemonics.Reservoir, [[table_name: table_name, version: version]] do
+      {:ok, memory_pid} ->
+        memory = GenServer.call memory_pid, :state
+        state = put_in state.tables, [{memory_pid, memory} | tables]
+        # NOTE: FastGlobal can't put pid & reference.
+        FastGlobal.put @global_tables_key, Enum.map(state.tables, &:erlang.term_to_binary/1)
+        for {memory_pid, _} <- old_tables do
+          try do
+            GenServer.call memory_pid, :stop
+          catch
+            :exit, {:normal, _} -> :normal
+          end
+        end
+        {:reply, :ok, state}
+      {:error, reason} -> {:reply, {:error, reason}, state}
+    end
+  end
+
+  @spec pop_old_tables([table], atom, non_neg_integer) :: {[table], [table]}
+  defp pop_old_tables(tables, table_name, version) do
+    {existing_tables, old_tables, rest_tables} = tables
       |> Enum.sort_by(fn {_, %{version: version}} -> version end, &>=/2)
       |> Enum.reduce({[], [], []}, fn
         {_, %{table_name: ^table_name, version: ^version}} = table, {existing_tables, old_tables, rest_tables} ->
@@ -48,21 +71,6 @@ defmodule Mnemonics.Repo do
         table, {existing_tables, old_tables, rest_tables} ->
           {existing_tables, old_tables, [table | rest_tables]}
       end)
-    for {memory_pid, _} <- old_tables do
-      try do
-        GenServer.call memory_pid, :stop
-      catch
-        :exit, {:normal, _} -> :normal
-      end
-    end
-    case Supervisor.start_child Mnemonics.Reservoir, [[table_name: table_name, version: version]] do
-      {:ok, memory_pid} ->
-        memory = GenServer.call memory_pid, :state
-        state = put_in state.tables, [{memory_pid, memory} | existing_tables ++ rest_tables]
-        # NOTE: FastGlobal can't put pid & reference.
-        FastGlobal.put @global_tables_key, Enum.map(state.tables, &:erlang.term_to_binary/1)
-        {:reply, :ok, state}
-      {:error, reason} -> {:reply, {:error, reason}, state}
-    end
+    {old_tables, existing_tables ++ rest_tables}
   end
 end
