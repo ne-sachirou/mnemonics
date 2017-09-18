@@ -44,25 +44,25 @@ defmodule Example do
   use Mnemonics, table_name: :examples
 end
 
-Mnemonics.Example.load 1
+Example.load 1
 ```
 
 We can lookup the table.
 
 ```elixir
-:ets.lookup Mnemonics.Example.table_name(1), :example1
+:ets.lookup Example.table_name(1), :example1
 ```
 
 Let's reload a new table. Put a new `examples.ets` into the ets_dir & load it with a new version number.
 
 ```elixir
-Mnemonics.Example.load 2
+Example.load 2
 ```
 
 We can lookup the new table.
 
 ```elixir
-:ets.lookup Mnemonics.Example.table_name(2), :example1
+:ets.lookup Example.table_name(2), :example1
 ```
 
 ### :ets.new/2 Option
