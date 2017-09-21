@@ -19,6 +19,7 @@ defmodule Mnemonics.Mixfile do
       ],
       homepage_url: "https://github.com/ne-sachirou/mnemonics",
       name: "Mnemonics",
+      source_url: "https://github.com/ne-sachirou/mnemonics",
     ]
   end
 
