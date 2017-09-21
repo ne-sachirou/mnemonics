@@ -34,7 +34,7 @@ defmodule Mnemonics do
       @doc """
       Get a table of the version.
       """
-      @spec table(non_neg_integer) :: Mnemonics.Repo.t
+      @spec table(non_neg_integer) :: Mnemonics.Memory.t
       def table(version) do
         Mnemonics.Repo.tables
         |> Enum.find(fn {_, memory} ->
