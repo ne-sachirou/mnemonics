@@ -41,10 +41,10 @@ defmodule Mnemonics.Repo do
   @doc """
   `:load_table` => Load a table of the table_name & version, then stop old ones.
   """
-  @spec handle_call({:load_table, atom, non_neg_integer}, GenServer.from, t) :: {:reply, :ok | {:error, term}, t}
-  def handle_call({:load_table, table_name, version}, _from, state) do
+  @spec handle_call({:load_table, atom, atom, non_neg_integer}, GenServer.from, t) :: {:reply, :ok | {:error, term}, t}
+  def handle_call({:load_table, module, table_name, version}, _from, state) do
     {old_tables, tables} = pop_old_tables state.tables, table_name, version
-    case Supervisor.start_child Mnemonics.Reservoir, [[table_name: table_name, version: version]] do
+    case Supervisor.start_child Mnemonics.Reservoir, [[module: module, table_name: table_name, version: version]] do
       {:ok, memory_pid} ->
         memory = GenServer.call memory_pid, :state
         state = put_in state.tables, [{memory_pid, memory} | tables]

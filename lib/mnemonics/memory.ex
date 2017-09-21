@@ -7,11 +7,12 @@ defmodule Mnemonics.Memory do
 
   @type t :: %{
     tid: :ets.tid,
+    module: atom,
     table_name: atom,
     version: non_neg_integer,
   }
 
-  defstruct tid: nil, table_name: nil, version: 0
+  defstruct tid: nil, module: nil, table_name: nil, version: 0
 
   @doc false
   @spec start_link(any, term) :: GenServer.on_start
@@ -20,12 +21,12 @@ defmodule Mnemonics.Memory do
   @doc """
   """
   @spec init([table_name: atom, version: non_neg_integer]) :: {:ok, t} | {:stop, :ets.tab | term}
-  def init(table_name: table_name, version: version) do
+  def init(module: module, table_name: table_name, version: version) do
     case [Application.get_env(:mnemonics, :ets_dir), "#{table_name}.ets"]
            |> Path.join
            |> String.to_charlist
            |> :ets.file2tab do
-      {:ok, table} -> {:ok, %__MODULE__{tid: table, table_name: table_name, version: version}}
+      {:ok, tid} -> {:ok, %__MODULE__{tid: tid, module: module, table_name: table_name, version: version}}
       {:error, reason} -> {:stop, reason}
     end
   end
