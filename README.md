@@ -26,15 +26,16 @@ Usage
 Config Mnemonics ets_dir. `config.exs`:
 
 ```elixir
-config :mnemonics, :ets_dir, "priv/seeds"
+config :mnemonics, :ets_dir, "priv/repo/seeds"
 ```
 
 Create an `example.ets` by `:ets.tab2file/3`. Then put it into the ets_dir. The `examples.ets` stores `{:example1, %{id: :example1}}`.
 
 ```
 priv/
-└seeds/
-  └examples.ets
+└repo/
+  └seeds/
+    └examples.ets
 ```
 
 Create an `Example` module, use Mnemonics & load.
