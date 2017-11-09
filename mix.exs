@@ -48,8 +48,8 @@ defmodule Mnemonics.Mixfile do
       links: %{
         "GitHub": "https://github.com/ne-sachirou/mnemonics",
       },
-      name: :mnemonics,
       maintainers: ["ne_Sachirou <utakata.c4se@gmail.com>"],
+      name: :mnemonics,
     ]
   end
 end

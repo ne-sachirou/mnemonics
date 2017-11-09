@@ -17,42 +17,51 @@ defmodule Mnemonics do
       @doc """
       Load an ETS table from file.
       """
-      @spec load(non_neg_integer) :: :ok | {:error, term}
+      @spec load(pos_integer) :: :ok | {:error, term}
       def load(version), do: GenServer.call Mnemonics.Repo, {:load_table, __MODULE__, unquote(table_name), version}
 
       @doc """
-      Get a latest table.
+      Take version snapshot of the table.
+      """
+      @spec snap(Mnemonics.Snap.t) :: Mnemonics.Snap.t
+      def snap(snap), do: snap snap, table().version
+
+      @spec snap(Mnemonics.Snap.t, pos_integer) :: Mnemonics.Snap.t
+      def snap(snap, version), do: Mnemonics.Snap.snap snap, unquote(table_name), version
+
+      @doc """
+      Get a table of some version.
       """
       @spec table :: Mnemonics.Memory.t
       def table do
-        Mnemonics.Repo.tables
-        |> Enum.filter(&(elem(&1, 1).table_name == unquote(table_name)))
-        |> Enum.max_by(&elem(&1, 1).version)
-        |> elem(1)
+        memories =
+          for {_, memory} <- Mnemonics.Repo.tables,
+            memory.table_name == unquote(table_name),
+            do: memory
+        Enum.max_by memories, &(&1).version
       end
 
-      @doc """
-      Get a table of the version.
-      """
-      @spec table(non_neg_integer) :: Mnemonics.Memory.t
+      @spec table(Mnemonics.Snap.t) :: Mnemonics.Memory.t
+      def table(%Mnemonics.Snap{} = snap), do: table snap.versions[unquote(table_name)]
+
+      @spec table(pos_integer) :: Mnemonics.Memory.t
       def table(version) do
-        Mnemonics.Repo.tables
-        |> Enum.find(fn {_, memory} ->
+        {_, memory} = Enum.find Mnemonics.Repo.tables, fn {_, memory} ->
           memory.table_name == unquote(table_name) and memory.version == version
-        end)
-        |> elem(1)
+        end
+        memory
       end
 
       @doc """
-      Get a latest table reference.
+      Get a table reference of some version.
       """
       @spec table_name :: :ets.tid
       def table_name, do: table().tid
 
-      @doc """
-      Get a table reference of the version.
-      """
-      @spec table_name(non_neg_integer) :: :ets.tid
+      @spec table_name(Mnemonics.Snap.t) :: :ets.tid
+      def table_name(%Mnemonics.Snap{} = snap), do: table(snap).tid
+
+      @spec table_name(pos_integer) :: :ets.tid
       def table_name(version), do: table(version).tid
     end
   end
