@@ -9,7 +9,9 @@ defmodule Mnemonics.Mixfile do
       elixir: "~> 1.5",
       elixirc_paths: elixirc_paths(Mix.env),
       package: package(),
+      preferred_cli_env: ["coveralls": :test, "coveralls.detail": :test, "coveralls.post": :test, "coveralls.html": :test],
       start_permanent: Mix.env == :prod,
+      test_coverage: [tool: ExCoveralls],
       version: "0.1.1",
 
       # Docs
@@ -32,6 +34,7 @@ defmodule Mnemonics.Mixfile do
 
   defp deps do
     [
+      {:excoveralls, "~> 0.7", only: :test},
       {:ex_doc, "~> 0.18", only: :dev, runtime: false},
       {:fastglobal, "~> 1.0"},
       {:inner_cotton, github: "ne-sachirou/inner_cotton", only: [:dev, :test]},
@@ -48,8 +51,8 @@ defmodule Mnemonics.Mixfile do
       links: %{
         "GitHub": "https://github.com/ne-sachirou/mnemonics",
       },
-      name: :mnemonics,
       maintainers: ["ne_Sachirou <utakata.c4se@gmail.com>"],
+      name: :mnemonics,
     ]
   end
 end

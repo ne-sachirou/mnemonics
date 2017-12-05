@@ -41,7 +41,7 @@ defmodule Mnemonics.Repo do
   @doc """
   `:load_table` => Load a table of the table_name & version, then stop old ones.
   """
-  @spec handle_call({:load_table, atom, atom, non_neg_integer}, GenServer.from, t) :: {:reply, :ok | {:error, term}, t}
+  @spec handle_call({:load_table, atom, atom, pos_integer}, GenServer.from, t) :: {:reply, :ok | {:error, term}, t}
   def handle_call({:load_table, module, table_name, version}, _from, state) do
     {old_tables, tables} = pop_old_tables state.tables, table_name, version
     case Supervisor.start_child Mnemonics.Reservoir, [[module: module, table_name: table_name, version: version]] do
@@ -62,7 +62,7 @@ defmodule Mnemonics.Repo do
     end
   end
 
-  @spec pop_old_tables([table], atom, non_neg_integer) :: {[table], [table]}
+  @spec pop_old_tables([table], atom, pos_integer) :: {[table], [table]}
   defp pop_old_tables(tables, table_name, version) do
     {existing_tables, old_tables, rest_tables} = tables
       |> Enum.sort_by(fn {_, %{version: version}} -> version end, &>=/2)

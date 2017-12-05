@@ -9,7 +9,7 @@ defmodule Mnemonics.Memory do
     tid: :ets.tid,
     module: atom,
     table_name: atom,
-    version: non_neg_integer,
+    version: pos_integer,
   }
 
   defstruct tid: nil, module: nil, table_name: nil, version: 0
@@ -20,7 +20,7 @@ defmodule Mnemonics.Memory do
 
   @doc """
   """
-  @spec init([table_name: atom, version: non_neg_integer]) :: {:ok, t} | {:stop, :ets.tab | term}
+  @spec init([table_name: atom, version: pos_integer]) :: {:ok, t} | {:stop, :ets.tab | term}
   def init(module: module, table_name: table_name, version: version) do
     case [Application.get_env(:mnemonics, :ets_dir), "#{table_name}.ets"]
            |> Path.join
