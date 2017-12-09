@@ -43,22 +43,44 @@ defmodule Mnemonics.Repo do
   """
   @spec handle_call({:load_table, atom, atom, pos_integer}, GenServer.from, t) :: {:reply, :ok | {:error, term}, t}
   def handle_call({:load_table, module, table_name, version}, _from, state) do
-    {old_tables, tables} = pop_old_tables state.tables, table_name, version
     case Supervisor.start_child Mnemonics.Reservoir, [[module: module, table_name: table_name, version: version]] do
       {:ok, memory_pid} ->
         memory = GenServer.call memory_pid, :state
-        state = put_in state.tables, [{memory_pid, memory} | tables]
+        {old_tables, state} = get_and_update_in state.tables, fn tables ->
+          {old_tables, tables} = pop_old_tables tables, table_name, version
+          {old_tables, [{memory_pid, memory} | tables]}
+        end
         # NOTE: FastGlobal can't put pid & reference.
         FastGlobal.put @global_tables_key, :erlang.term_to_binary(state.tables)
         for {memory_pid, _} <- old_tables do
           try do
             GenServer.call memory_pid, :stop
           catch
-            :exit, {:normal, _} -> :normal
+            :exit, {:normal, _} -> nil
           end
         end
         {:reply, :ok, state}
       {:error, reason} -> {:reply, {:error, reason}, state}
+    end
+  end
+
+  @doc false
+  @spec handle_call({:call_memory, Memory.t, term}, GenServer.from, t) :: {:reply, any | {:error, any}, t}
+  def handle_call({:call_memory, memory, message}, from, state) do
+    case Enum.find state.tables, &match?({_, ^memory}, &1) do
+      {pid, _} ->
+        Task.start fn ->
+          try do
+            GenServer.reply from, GenServer.call(pid, message)
+          rescue
+            error -> GenServer.reply from, {:error, error}
+          catch
+            :exit, {:normal, _} -> nil
+            kind, reason -> GenServer.reply from, {:error, {kind, reason}}
+          end
+        end
+        {:noreply, state}
+      _ -> {:reply, {:error, "Mnemonics.Repo: Memory not found."}, state}
     end
   end
 

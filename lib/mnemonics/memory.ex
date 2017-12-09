@@ -23,9 +23,9 @@ defmodule Mnemonics.Memory do
   @spec init([table_name: atom, version: pos_integer]) :: {:ok, t} | {:stop, :ets.tab | term}
   def init(module: module, table_name: table_name, version: version) do
     case [Application.get_env(:mnemonics, :ets_dir), "#{table_name}.ets"]
-           |> Path.join
-           |> String.to_charlist
-           |> :ets.file2tab do
+         |> Path.join
+         |> String.to_charlist
+         |> :ets.file2tab do
       {:ok, tid} -> {:ok, %__MODULE__{tid: tid, module: module, table_name: table_name, version: version}}
       {:error, reason} -> {:stop, reason}
     end
@@ -47,5 +47,16 @@ defmodule Mnemonics.Memory do
   def handle_call(:stop, _from, state) do
     :ets.delete state.tid
     {:stop, :normal, state}
+  end
+
+  @doc false
+  @spec handle_call({:write, (t -> any)}, GenServer.from, t) :: {:reply, any | {:error, any}, t}
+  def handle_call({:write, callback}, _from, state) do
+    :ets.safe_fixtable state.tid, true
+    {:reply, callback.(state), state}
+  rescue
+    error -> {:reply, {:error, error}, state}
+  after
+    :ets.safe_fixtable state.tid, false
   end
 end

@@ -28,4 +28,16 @@ defmodule Mnemonics.MemoryTest do
       refute memory.tid in :ets.all
     end
   end
+
+  describe "handle_call(:write)/3" do
+    test "Write request." do
+      Example.create_example_ets :examples_write_1
+      {:ok, memory} = Memory.init module: Example, table_name: :examples_write_1, version: 1
+      assert [] == :ets.lookup memory.tid, 3
+      Memory.handle_call {:write, fn memory -> :ets.insert memory.tid, {3, %Example{id: 3, name: "3"}} end},
+        self(),
+        memory
+      assert [{3, %Example{id: 3, name: "3"}}] == :ets.lookup memory.tid, 3
+    end
+  end
 end
