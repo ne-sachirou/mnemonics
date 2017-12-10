@@ -35,7 +35,7 @@ defmodule Mnemonics do
       @spec table :: Mnemonics.Memory.t
       def table do
         memories =
-          for {_, memory} <- Mnemonics.Repo.tables,
+          for memory <- Mnemonics.Repo.tables,
             memory.table_name == unquote(table_name),
             do: memory
         Enum.max_by memories, &(&1).version
@@ -46,7 +46,7 @@ defmodule Mnemonics do
 
       @spec table(pos_integer) :: Mnemonics.Memory.t
       def table(version) do
-        {_, memory} = Enum.find Mnemonics.Repo.tables, fn {_, memory} ->
+        memory = Enum.find Mnemonics.Repo.tables, fn memory ->
           memory.table_name == unquote(table_name) and memory.version == version
         end
         memory

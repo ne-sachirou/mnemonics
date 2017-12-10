@@ -39,5 +39,20 @@ defmodule Mnemonics.MemoryTest do
         memory
       assert [{3, %Example{id: 3, name: "3"}}] == :ets.lookup memory.tid, 3
     end
+
+    test "Raising an error doesn't crash." do
+      Example.create_example_ets :examples_write_2
+      {:ok, memory} = Memory.init module: Example, table_name: :examples_write_2, version: 1
+      assert {:reply, {:error, %RuntimeError{message: "Error test"}}, memory} ==
+        Memory.handle_call {:write, fn _ -> raise "Error test" end}, self(), memory
+    end
+
+    test "Write from outside." do
+      Example.create_example_mnemonics ExampleWrite3, :examples_write_3
+      ExampleWrite3.load 1
+      assert [] == :ets.lookup ExampleWrite3.table_name, 3
+      GenServer.call ExampleWrite3.table.pid, {:write, fn memory -> :ets.insert memory.tid, {3, %Example{id: 3, name: "3"}} end}
+      assert [{3, %Example{id: 3, name: "3"}}] == :ets.lookup ExampleWrite3.table_name, 3
+    end
   end
 end
