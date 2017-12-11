@@ -13,7 +13,7 @@ defmodule Mnemonics do
   """
 
   defmacro __using__(table_name: table_name) do
-    quote do
+    quote location: :keep do
       @doc """
       Load an ETS table from file.
       """
