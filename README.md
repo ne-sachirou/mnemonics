@@ -16,7 +16,7 @@ Add `mnemonics` to your list of dependencies in `mix.exs`:
 ```elixir
 def deps do
   [
-    {:mnemonics, "~> 0.1"}
+    {:mnemonics, "~> 0.2"}
   ]
 end
 ```
@@ -64,6 +64,21 @@ We can lookup the new table.
 
 ```elixir
 :ets.lookup Example.table_name(2), :example1
+
+snap = Mnemonics.Snap.snap Mnemonics.Snap.new, 2, %{}
+:ets.lookup Example.table_name(snap), :example1
+```
+
+Mnemonics has cache function named `Mnemonics.Snap`.
+
+```elixir
+snap = Mnemonics.Snap.snap Mnemonics.Snap.new, 2, %{}
+get_and_update_in snap[:examples].cache[:example1], fn
+  nil ->
+    example = :ets.lookup Example.table_name(snap), :example1
+    {example, example}
+  example -> {example, example}
+end
 ```
 
 ### :ets.new/2 Option

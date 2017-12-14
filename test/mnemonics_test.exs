@@ -51,13 +51,11 @@ defmodule MnemonicsTest do
   end
 
   describe "snap/?" do
-    test "Take a latest snapshot." do
-      assert %Snap{versions: %{examples: 1}, cache: %{examples: %{}}} == Example.snap Snap.new
-    end
+    test "Take a latest snapshot.",
+      do: assert %Snap{versions: %{examples: 1}, cache: %{examples: %{}}} == Example.snap Snap.new
 
-    test "Take a snapshot of the version." do
-      assert %Snap{versions: %{examples: 1}, cache: %{examples: %{}}} == Example.snap Snap.new, 1
-    end
+    test "Take a snapshot of the version.",
+      do: assert %Snap{versions: %{examples: 1}, cache: %{examples: %{}}} == Example.snap Snap.new, 1
   end
 
   describe "table/?" do
@@ -79,12 +77,10 @@ defmodule MnemonicsTest do
   end
 
   describe "table_name/?" do
-    test "Get the table name." do
-      refute :undefined == :ets.info Example.table_name
-    end
+    test "Get the table name.",
+      do: refute :undefined == :ets.info Example.table_name
 
-    test "Get the table name of the version." do
-      refute :undefined == :ets.info Example.table_name 1
-    end
+    test "Get the table name of the version.",
+      do: refute :undefined == :ets.info Example.table_name 1
   end
 end

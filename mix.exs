@@ -9,10 +9,15 @@ defmodule Mnemonics.Mixfile do
       elixir: "~> 1.5",
       elixirc_paths: elixirc_paths(Mix.env),
       package: package(),
-      preferred_cli_env: [coveralls: :test, "coveralls.detail": :test, "coveralls.post": :test, "coveralls.html": :test],
+      preferred_cli_env: [
+        coveralls: :test,
+        "coveralls.detail": :test,
+        "coveralls.post": :test,
+        "coveralls.html": :test,
+      ],
       start_permanent: Mix.env == :prod,
       test_coverage: [tool: ExCoveralls],
-      version: "0.1.1",
+      version: "0.2.0",
 
       # Docs
       docs: [

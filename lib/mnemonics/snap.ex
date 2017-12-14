@@ -73,8 +73,8 @@ defmodule Mnemonics.Snap do
   def get_and_update(snap, table_name, function) do
     {get_value, table_snap} = function.(snap[table_name])
     %{version: version, cache: cache} = table_snap
-    |> update_in([:version], &(&1 || 1))
-    |> update_in([:cache], &(&1 || %{}))
+      |> update_in([:version], &(&1 || 1))
+      |> update_in([:cache], &(&1 || %{}))
     snap = put_in snap.versions[table_name], version
     snap = put_in snap.cache[table_name], cache
     {get_value, snap}
