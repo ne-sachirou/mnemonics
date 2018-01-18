@@ -20,9 +20,9 @@ defmodule Mnemonics.Snap do
   @type table_snap :: %{version: pos_integer, cache: term}
 
   @type t :: %__MODULE__{
-    versions: %{atom => pos_integer},
-    cache: %{atom => term},
-  }
+          versions: %{atom => pos_integer},
+          cache: %{atom => term}
+        }
 
   defstruct versions: %{}, cache: %{}
 
@@ -48,7 +48,7 @@ defmodule Mnemonics.Snap do
   """
   @spec snap(t, atom, pos_integer, term) :: t
   def snap(snap, table_name, version, cache \\ %{}),
-    do: put_in snap[table_name], %{version: version, cache: cache}
+    do: put_in(snap[table_name], %{version: version, cache: cache})
 
   @doc false
   @spec fetch(t, atom) :: {:ok, table_snap} | :error
@@ -62,7 +62,7 @@ defmodule Mnemonics.Snap do
   @doc false
   @spec get(t, atom, any) :: table_snap | any
   def get(snap, table_name, default) do
-    case fetch snap, table_name do
+    case fetch(snap, table_name) do
       {:ok, value} -> value
       :error -> default
     end
@@ -72,11 +72,14 @@ defmodule Mnemonics.Snap do
   @spec get_and_update(t, atom, (table_snap -> {any, table_snap} | :pop)) :: {any, t}
   def get_and_update(snap, table_name, function) do
     {get_value, table_snap} = function.(snap[table_name])
-    %{version: version, cache: cache} = table_snap
+
+    %{version: version, cache: cache} =
+      table_snap
       |> update_in([:version], &(&1 || 1))
       |> update_in([:cache], &(&1 || %{}))
-    snap = put_in snap.versions[table_name], version
-    snap = put_in snap.cache[table_name], cache
+
+    snap = put_in(snap.versions[table_name], version)
+    snap = put_in(snap.cache[table_name], cache)
     {get_value, snap}
   end
 
@@ -84,8 +87,8 @@ defmodule Mnemonics.Snap do
   @spec pop(t, atom) :: {table_snap, t}
   def pop(snap, table_name) do
     table_snap = snap[table_name]
-    snap = update_in snap.versions, &Map.delete(&1, table_name)
-    snap = update_in snap.cache, &Map.delete(&1, table_name)
+    snap = update_in(snap.versions, &Map.delete(&1, table_name))
+    snap = update_in(snap.cache, &Map.delete(&1, table_name))
     {table_snap, snap}
   end
 end

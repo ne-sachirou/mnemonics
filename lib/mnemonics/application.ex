@@ -4,13 +4,12 @@ defmodule Mnemonics.Application do
   use Application
 
   def start(_type, _args) do
-    # import Supervisor.Spec
     children = [
       {Mnemonics.Repo, []},
-      # worker(Mnemonics.Repo, []),
-      {Mnemonics.Reservoir, []},
+      {Mnemonics.Reservoir, []}
     ]
+
     opts = [strategy: :one_for_one, name: Mnemonics.Supervisor]
-    Supervisor.start_link children, opts
+    Supervisor.start_link(children, opts)
   end
 end
