@@ -8,13 +8,13 @@ defmodule Mnemonics.Memory do
   @type t :: %{
           tid: :ets.tid(),
           pid: pid,
-          module: atom,
+          module: module,
           table_name: atom,
           version: pos_integer
         }
 
   @type init_args :: [
-          module: atom,
+          module: module,
           table_name: atom,
           version: pos_integer
         ]

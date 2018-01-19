@@ -43,7 +43,7 @@ defmodule Mnemonics.Repo do
   @doc """
   `:load_table` => Load a table of the table_name & version, then stop old ones.
   """
-  @spec handle_call({:load_table, atom, atom, pos_integer}, GenServer.from(), t) ::
+  @spec handle_call({:load_table, module, atom, pos_integer}, GenServer.from(), t) ::
           {:reply, :ok | {:error, term}, t}
   def handle_call({:load_table, module, table_name, version}, _from, state) do
     case Reservoir.start_child(module: module, table_name: table_name, version: version) do
