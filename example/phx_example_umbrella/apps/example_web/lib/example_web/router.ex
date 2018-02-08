@@ -7,5 +7,7 @@ defmodule ExampleWeb.Router do
 
   scope "/api", ExampleWeb do
     pipe_through(:api)
+
+    resources("/mortals", MortalController)
   end
 end
