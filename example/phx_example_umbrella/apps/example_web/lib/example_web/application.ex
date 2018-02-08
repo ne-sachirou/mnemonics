@@ -1,4 +1,6 @@
 defmodule ExampleWeb.Application do
+  @moduledoc false
+
   use Application
 
   def start(_type, _args) do
@@ -7,7 +9,7 @@ defmodule ExampleWeb.Application do
     # Define workers and child supervisors to be supervised
     children = [
       # Start the endpoint when the application starts
-      supervisor(ExampleWeb.Endpoint, []),
+      supervisor(ExampleWeb.Endpoint, [])
       # Start your own worker by calling: ExampleWeb.Worker.start_link(arg1, arg2, arg3)
       # worker(ExampleWeb.Worker, [arg1, arg2, arg3]),
     ]

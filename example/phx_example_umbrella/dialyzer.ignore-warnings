@@ -1,0 +1,2 @@
+lib/phoenix/router.ex:2: Function call/2 has no local return
+lib/supervisor.ex:81: Undefined callback function init/1 (behaviour 'Elixir.Supervisor')

@@ -3,6 +3,8 @@ alias Mix.Tasks.Server
 require Logger
 
 defmodule Mix.Tasks.Server.PostgresWorker do
+  @moduledoc false
+
   use GenServer
 
   def start_link(_), do: GenServer.start_link(__MODULE__, [])
@@ -24,6 +26,8 @@ defmodule Mix.Tasks.Server.PostgresWorker do
 end
 
 defmodule Mix.Tasks.Server.PhoenixWorker do
+  @moduledoc false
+
   use Task
 
   def start_link(_), do: Task.start_link(__MODULE__, :run, [])
@@ -75,6 +79,8 @@ defmodule Mix.Tasks.Server.PhoenixWorker do
 end
 
 defmodule Mix.Tasks.Server.Supervisor do
+  @moduledoc false
+
   use Supervisor
 
   def start_link do
@@ -90,13 +96,16 @@ end
 
 defmodule Mix.Tasks.Server do
   @moduledoc """
+  Start app stack.
+
+  `mix do compile, server && docker-compose down`
   """
 
   require Logger
 
   use Mix.Task
 
-  @shortdoc ""
+  @shortdoc "Start app stack"
 
   @spec run([String.t()]) :: any
   def run(_args) do

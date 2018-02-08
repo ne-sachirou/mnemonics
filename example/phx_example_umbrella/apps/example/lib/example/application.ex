@@ -12,8 +12,12 @@ defmodule Example.Application do
   def start(_type, _args) do
     import Supervisor.Spec, warn: false
 
-    Supervisor.start_link([
-      supervisor(Example.Repo, []),
-    ], strategy: :one_for_one, name: Example.Supervisor)
+    Supervisor.start_link(
+      [
+        supervisor(Example.Repo, [])
+      ],
+      strategy: :one_for_one,
+      name: Example.Supervisor
+    )
   end
 end

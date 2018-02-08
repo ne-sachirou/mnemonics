@@ -4,8 +4,12 @@ defmodule Example.Umbrella.Mixfile do
   def project do
     [
       apps_path: "apps",
-      start_permanent: Mix.env == :prod,
-      deps: deps()
+      start_permanent: Mix.env() == :prod,
+      deps: deps(),
+      dialyzer: [
+        ignore_warnings: "dialyzer.ignore-warnings",
+        plt_add_apps: [:mix]
+      ]
     ]
   end
 
@@ -22,6 +26,8 @@ defmodule Example.Umbrella.Mixfile do
   # Dependencies listed here are available only for this project
   # and cannot be accessed from applications inside the apps folder
   defp deps do
-    []
+    [
+      {:inner_cotton, github: "ne-sachirou/inner_cotton", only: [:dev, :test]}
+    ]
   end
 end
