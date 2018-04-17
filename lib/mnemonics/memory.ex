@@ -29,8 +29,7 @@ defmodule Mnemonics.Memory do
   @spec start_link(any, term) :: GenServer.on_start()
   def start_link(_, arg), do: GenServer.start_link(__MODULE__, arg)
 
-  @doc """
-  """
+  @doc false
   @spec init(init_args) :: {:ok, t} | {:stop, :ets.tab() | term}
   def init(module: module, table_name: table_name, version: version) do
     case [Application.get_env(:mnemonics, :ets_dir), "#{table_name}.ets"]
@@ -70,7 +69,6 @@ defmodule Mnemonics.Memory do
     {:stop, :normal, state}
   end
 
-  @doc false
   @spec handle_call({:write, (t -> any)}, GenServer.from(), t) :: {:reply, any | {:error, any}, t}
   def handle_call({:write, callback}, _from, state) do
     :ets.safe_fixtable(state.tid, true)

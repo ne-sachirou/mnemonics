@@ -12,7 +12,7 @@ defmodule MnemonicsTest do
     assert [{1, %Example{id: 1, name: "1"}}] == :ets.lookup(Example.table_name(1), 1)
   end
 
-  describe "load/1" do
+  describe "load/?" do
     test "Load." do
       table_name = :examples_load_1
       Example.create_example_mnemonics(ExampleLoad1, table_name)
@@ -70,6 +70,19 @@ defmodule MnemonicsTest do
              )
 
       assert [{1, %Example{id: 1, name: "1"}}] == :ets.lookup(ExampleLoad3.table_name(1), 1)
+    end
+
+    test "Load with timeout." do
+      table_name = :examples_load_4
+      Example.create_example_mnemonics(ExampleLoad4, table_name)
+      :ok = ExampleLoad4.load(1, timeout: 5000)
+
+      assert Enum.any?(
+               Repo.tables(),
+               &match?(%Memory{module: ExampleLoad4, table_name: ^table_name, version: 1}, &1)
+             )
+
+      assert [{1, %Example{id: 1, name: "1"}}] == :ets.lookup(ExampleLoad4.table_name(1), 1)
     end
   end
 

@@ -16,11 +16,19 @@ defmodule Mnemonics do
     quote location: :keep do
       @doc """
       Load an ETS table from file.
+
+      opts:
+
+      * `timeout:` Timeout ms (default 5000).
       """
-      @spec load(pos_integer) :: :ok | {:error, term}
-      def load(version),
+      @spec load(pos_integer, keyword) :: :ok | {:error, term}
+      def load(version, opts \\ []),
         do:
-          GenServer.call(Mnemonics.Repo, {:load_table, __MODULE__, unquote(table_name), version})
+          GenServer.call(
+            Mnemonics.Repo,
+            {:load_table, __MODULE__, unquote(table_name), version},
+            opts[:timeout] || 5000
+          )
 
       @doc """
       Take version snapshot of the table.
