@@ -37,7 +37,8 @@ defmodule Mnemonics.Repo do
   @spec tables :: [Memory.t()]
   def tables,
     do:
-      @global_tables_key |> FastGlobal.get(@global_tables_default_value)
+      @global_tables_key
+      |> FastGlobal.get(@global_tables_default_value)
       |> :erlang.binary_to_term()
 
   @doc """

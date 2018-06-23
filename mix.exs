@@ -1,12 +1,15 @@
 defmodule Mnemonics.Mixfile do
   use Mix.Project
 
+  @github "https://github.com/ne-sachirou/mnemonics"
+
   def project do
     [
       app: :mnemonics,
       deps: deps(),
       description:
         "Read only data store for Elixir: fast, concurrently, for large data & hot reloadable.",
+      dialyzer: [ignore_warnings: "dialyzer.ignore-warnings"],
       elixir: "~> 1.5",
       elixirc_paths: elixirc_paths(Mix.env()),
       package: package(),
@@ -25,9 +28,9 @@ defmodule Mnemonics.Mixfile do
         main: "readme",
         extras: ["README.md"]
       ],
-      homepage_url: "https://github.com/ne-sachirou/mnemonics",
+      homepage_url: @github,
       name: "Mnemonics",
-      source_url: "https://github.com/ne-sachirou/mnemonics"
+      source_url: @github
     ]
   end
 
@@ -52,10 +55,8 @@ defmodule Mnemonics.Mixfile do
   def package do
     [
       files: ["LICENSE", "README.md", "mix.exs", "lib"],
-      licenses: ["GPL-3.0"],
-      links: %{
-        GitHub: "https://github.com/ne-sachirou/mnemonics"
-      },
+      licenses: ["GPL-3.0-or-later"],
+      links: %{GitHub: @github},
       maintainers: ["ne_Sachirou <utakata.c4se@gmail.com>"],
       name: :mnemonics
     ]
