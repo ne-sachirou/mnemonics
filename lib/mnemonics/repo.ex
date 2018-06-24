@@ -9,45 +9,60 @@ defmodule Mnemonics.Repo do
   use GenServer
 
   @type t :: %__MODULE__{
+          sup_name: atom,
+          ets_dir: binary,
           tables: [Memory.t()]
         }
 
   @global_tables_default_value :erlang.term_to_binary([])
 
-  @global_tables_key FastGlobal.new(:"#{__MODULE__}.Tables}")
-
   @living_versions 2
 
-  defstruct tables: []
+  defstruct sup_name: nil, ets_dir: "", tables: []
 
   @doc false
-  @spec start_link(term) :: GenServer.on_start()
-  def start_link(arg), do: GenServer.start_link(__MODULE__, arg, name: __MODULE__)
+  @spec start_link(keyword) :: GenServer.on_start()
+  def start_link(arg), do: GenServer.start_link(__MODULE__, arg, name: arg[:name])
 
   @doc false
-  @spec init(term) :: {:ok, t}
-  def init(_arg) do
-    FastGlobal.put(@global_tables_key, @global_tables_default_value)
-    {:ok, %__MODULE__{}}
+  @impl true
+  @spec init(keyword) :: {:ok, t}
+  def init(arg) do
+    global_tables_key = FastGlobal.new(Module.concat(arg[:name], Tables))
+    FastGlobal.put(global_tables_key, @global_tables_default_value)
+    {:ok, %__MODULE__{sup_name: arg[:sup_name], ets_dir: arg[:ets_dir]}}
   end
 
   @doc """
   All living tables.
   """
-  @spec tables :: [Memory.t()]
-  def tables,
+  @spec tables(term) :: [Memory.t()]
+  def tables(sup_name \\ Mnemonics)
+
+  def tables({FastGlobal, global_tables_key}),
     do:
-      @global_tables_key
+      global_tables_key
       |> FastGlobal.get(@global_tables_default_value)
       |> :erlang.binary_to_term()
+
+  def tables(sup_name), do: tables({FastGlobal, global_tables_key(sup_name)})
+
+  def global_tables_key(sup_name), do: sup_name |> Module.concat(Repo.Tables) |> FastGlobal.new()
 
   @doc """
   `:load_table` => Load a table of the table_name & version, then stop old ones.
   """
+  @impl true
   @spec handle_call({:load_table, module, atom, pos_integer}, GenServer.from(), t) ::
           {:reply, :ok | {:error, term}, t}
   def handle_call({:load_table, module, table_name, version}, _from, state) do
-    case Reservoir.start_child(module: module, table_name: table_name, version: version) do
+    case Reservoir.start_child(
+           module: module,
+           table_name: table_name,
+           version: version,
+           sup_name: state.sup_name,
+           ets_dir: state.ets_dir
+         ) do
       {:ok, memory_pid} ->
         memory = GenServer.call(memory_pid, :state)
 
@@ -58,7 +73,7 @@ defmodule Mnemonics.Repo do
           end)
 
         # NOTE: FastGlobal can't put pid & reference.
-        FastGlobal.put(@global_tables_key, :erlang.term_to_binary(state.tables))
+        FastGlobal.put(global_tables_key(state.sup_name), :erlang.term_to_binary(state.tables))
 
         for memory <- old_tables do
           try do

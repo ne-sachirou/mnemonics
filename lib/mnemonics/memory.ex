@@ -16,7 +16,8 @@ defmodule Mnemonics.Memory do
   @type init_args :: [
           module: module,
           table_name: atom,
-          version: pos_integer
+          version: pos_integer,
+          ets_dir: binary
         ]
 
   defstruct tid: nil, pid: nil, module: nil, table_name: nil, version: 0
@@ -30,9 +31,10 @@ defmodule Mnemonics.Memory do
   def start_link(_, arg), do: GenServer.start_link(__MODULE__, arg)
 
   @doc false
+  @impl true
   @spec init(init_args) :: {:ok, t} | {:stop, :ets.tab() | term}
-  def init(module: module, table_name: table_name, version: version) do
-    case [Application.get_env(:mnemonics, :ets_dir), "#{table_name}.ets"]
+  def init(module: module, table_name: table_name, version: version, ets_dir: ets_dir) do
+    case [ets_dir, "#{table_name}.ets"]
          |> Path.join()
          |> String.to_charlist()
          |> :ets.file2tab() do
@@ -52,6 +54,7 @@ defmodule Mnemonics.Memory do
   end
 
   @doc false
+  @impl true
   @spec terminate(:normal | :shutdown | {:shutdown, term} | term, t) :: term
   def terminate(_reason, _state), do: :ok
 
@@ -60,6 +63,7 @@ defmodule Mnemonics.Memory do
 
   `:stop` => Delete the ETS & stop.
   """
+  @impl true
   @spec handle_call(:state, GenServer.from(), t) :: {:reply, t, t}
   def handle_call(:state, _from, t), do: {:reply, t, t}
 

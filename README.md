@@ -11,7 +11,7 @@ Mnemonics is analogous to Ruby's [ActiveHash](https://rubygems.org/gems/active_h
 
 Installation
 --
-Add `mnemonics` to your list of dependencies in `mix.exs`:
+Add `mnemonics` to your list of dependencies in `mix.exs`.
 
 ```elixir
 def deps do
@@ -21,14 +21,25 @@ def deps do
 end
 ```
 
-Usage
---
-Config Mnemonics ets_dir. `config.exs`:
+Start under your application.
 
 ```elixir
-config :mnemonics, :ets_dir, "priv/repo/seeds"
+defmodule Your.Application do
+  use Application
+
+  def start(_type, _args) do
+    children = [
+      {Mnemonics, [name: Your.Mnemonics, ets_dir: "/tmp"]}
+    ]
+
+    opts = [strategy: :one_for_one, name: Your.Supervisor]
+    Supervisor.start_link(children, opts)
+  end
+end
 ```
 
+Usage
+--
 Create an `example.ets` by `:ets.tab2file/3`. Then put it into the ets_dir. The `examples.ets` stores `{:example1, %{id: :example1}}`.
 
 ```
@@ -42,7 +53,7 @@ Create an `Example` module, use Mnemonics & load.
 
 ```elixir
 defmodule Example do
-  use Mnemonics, table_name: :examples
+  use Mnemonics, table_name: :examples, sup_name: Your.Mnemonics
 end
 
 Example.load 1
