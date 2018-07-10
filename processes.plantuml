@@ -1,6 +1,6 @@
 @startuml
 
-object "Mnemonics.Application" as Application
+object Mnemonics
 object "Mnemonics.Repo" as Repo {
   tables = "[{memory1, 2, tid2}, {memory2, 1, tid3}]"
 }
@@ -27,8 +27,8 @@ object "ETS" as memory2_1_ets {
   tid = tid3
 }
 
-Application <|-- Repo
-Application <|-- Reservoir
+Mnemonics <|-- Repo
+Mnemonics <|-- Reservoir
 Reservoir <|-- memory1_1
 memory1_1 <|-- memory1_1_ets
 Reservoir <|-- memory1_2

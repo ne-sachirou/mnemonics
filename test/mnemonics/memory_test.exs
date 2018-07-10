@@ -6,12 +6,19 @@ defmodule Mnemonics.MemoryTest do
 
   doctest Memory
 
+  defp ets_dir, do: "/tmp/mnemonics"
+
   describe "init/1" do
     test "Start an ETS." do
       Example.create_example_ets(:examples_init_1)
 
       assert {:ok, %Memory{module: Example, table_name: :examples_init_1, version: 1} = memory} =
-               Memory.init(module: Example, table_name: :examples_init_1, version: 1)
+               Memory.init(
+                 module: Example,
+                 table_name: :examples_init_1,
+                 version: 1,
+                 ets_dir: ets_dir()
+               )
 
       refute :undefined == :ets.info(memory.tid)
       assert memory.tid in :ets.all()
@@ -23,7 +30,12 @@ defmodule Mnemonics.MemoryTest do
       Example.create_example_ets(:examples_stop_1)
 
       assert {:ok, %Memory{module: Example, table_name: :examples_stop_1, version: 1} = memory} =
-               Memory.init(module: Example, table_name: :examples_stop_1, version: 1)
+               Memory.init(
+                 module: Example,
+                 table_name: :examples_stop_1,
+                 version: 1,
+                 ets_dir: ets_dir()
+               )
 
       refute :undefined == :ets.info(memory.tid)
       assert memory.tid in :ets.all()
@@ -36,7 +48,15 @@ defmodule Mnemonics.MemoryTest do
   describe "handle_call(:write)/3" do
     test "Write request." do
       Example.create_example_ets(:examples_write_1)
-      {:ok, memory} = Memory.init(module: Example, table_name: :examples_write_1, version: 1)
+
+      {:ok, memory} =
+        Memory.init(
+          module: Example,
+          table_name: :examples_write_1,
+          version: 1,
+          ets_dir: ets_dir()
+        )
+
       assert [] == :ets.lookup(memory.tid, 3)
 
       Memory.handle_call(
@@ -50,7 +70,14 @@ defmodule Mnemonics.MemoryTest do
 
     test "Raising an error doesn't crash." do
       Example.create_example_ets(:examples_write_2)
-      {:ok, memory} = Memory.init(module: Example, table_name: :examples_write_2, version: 1)
+
+      {:ok, memory} =
+        Memory.init(
+          module: Example,
+          table_name: :examples_write_2,
+          version: 1,
+          ets_dir: ets_dir()
+        )
 
       assert {:reply, {:error, %RuntimeError{message: "Error test"}}, memory} ==
                Memory.handle_call({:write, fn _ -> raise "Error test" end}, self(), memory)

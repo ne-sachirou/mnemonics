@@ -1,2 +1,3 @@
+lib/mnemonics/repo.ex:58: Function handle_call/3 has no local return
 lib/mnemonics/reservoir.ex:4: Function 'MACRO-__before_compile__'/2 has no local return
 lib/mnemonics/reservoir.ex:5: The call 'Elixir.Version':'match?'(<<_:40>>,<<_:64>>) will never return since it differs in the 1st argument from the success typing arguments: (#{'__struct__':='Elixir.Version', 'build':='nil' | binary(), 'major':=binary() | non_neg_integer(), 'minor':='nil' | non_neg_integer(), 'patch':='nil' | non_neg_integer(), 'pre':=[binary() | non_neg_integer()]},binary() | #{'__struct__':='Elixir.Version.Requirement', 'compiled':=boolean(), 'matchspec':=[{atom() | tuple(),[any()],[any()]}] | ets:comp_match_spec(), 'source':=_})

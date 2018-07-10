@@ -12,7 +12,31 @@ defmodule Mnemonics do
       [{1, %Mnemonics.Example{id: 1, name: "1"}}]
   """
 
-  defmacro __using__(table_name: table_name) do
+  use Supervisor
+
+  @spec start_link(keyword) :: Supervisor.on_start()
+  def start_link(arg) do
+    arg = arg |> put_in([:sup_name], arg[:name] || __MODULE__) |> Keyword.delete(:name)
+    Supervisor.start_link(__MODULE__, arg)
+  end
+
+  @impl true
+  def init(arg) do
+    unless Keyword.has_key?(arg, :ets_dir), do: raise(":ets_dir is required.")
+
+    children = [
+      {Mnemonics.Repo, put_in(arg[:name], Module.concat(arg[:sup_name], Repo))},
+      {Mnemonics.Reservoir, put_in(arg[:name], Module.concat(arg[:sup_name], Reservoir))}
+    ]
+
+    Supervisor.init(children, strategy: :one_for_one)
+  end
+
+  defmacro __using__(opts) do
+    table_name = Keyword.fetch!(opts, :table_name)
+    sup_name = opts[:sup_name] || Mnemonics
+    global_tables_key = Mnemonics.Repo.global_tables_key(sup_name)
+
     quote location: :keep do
       @doc """
       Load an ETS table from file.
@@ -25,7 +49,7 @@ defmodule Mnemonics do
       def load(version, opts \\ []),
         do:
           GenServer.call(
-            Mnemonics.Repo,
+            Module.concat(unquote(sup_name), Repo),
             {:load_table, __MODULE__, unquote(table_name), version},
             opts[:timeout] || 5000
           )
@@ -45,7 +69,7 @@ defmodule Mnemonics do
       @spec table :: Mnemonics.Memory.t()
       def table do
         memories =
-          for memory <- Mnemonics.Repo.tables(),
+          for memory <- Mnemonics.Repo.tables({FastGlobal, unquote(global_tables_key)}),
               memory.table_name == unquote(table_name),
               do: memory
 
@@ -57,12 +81,16 @@ defmodule Mnemonics do
 
       @spec table(pos_integer) :: Mnemonics.Memory.t()
       def table(version) do
-        memory =
-          Enum.find(Mnemonics.Repo.tables(), fn memory ->
-            memory.table_name == unquote(table_name) and memory.version == version
-          end)
-
-        memory
+        case Enum.find(
+               Mnemonics.Repo.tables({FastGlobal, unquote(global_tables_key)}),
+               fn
+                 %{table_name: unquote(table_name), version: ^version} -> true
+                 _ -> false
+               end
+             ) do
+          nil -> raise "There's no table {#{unquote(table_name)}}, #{version}}."
+          memory -> memory
+        end
       end
 
       @doc """

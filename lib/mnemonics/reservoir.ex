@@ -9,19 +9,20 @@ defmodule Mnemonics.Reservoir.CompileHook do
         alias Mnemonics.Memory
 
         @doc false
-        @spec start_link(term) :: Supervisor.on_start()
-        def start_link(arg), do: DynamicSupervisor.start_link(__MODULE__, arg, name: __MODULE__)
+        @spec start_link(keyword) :: Supervisor.on_start()
+        def start_link(arg), do: DynamicSupervisor.start_link(__MODULE__, arg, name: arg[:name])
 
         @doc false
-        # @spec init([term]) :: {:ok, DynamicSupervisor.sup_flags()} | :ignore
         def init(_arg), do: DynamicSupervisor.init(strategy: :one_for_one)
 
         @doc """
         Helper function to start DynamicSupervisor child for both Elixir 1.5 & 1.6.
         """
         @spec start_child(Memory.init_args()) :: Supervisor.on_start_child()
-        def start_child(memory_args),
-          do: DynamicSupervisor.start_child(__MODULE__, {Memory, memory_args})
+        def start_child(arg) do
+          {sup_name, arg} = pop_in(arg[:sup_name])
+          DynamicSupervisor.start_child(Module.concat(sup_name, Reservoir), {Memory, arg})
+        end
       end
     else
       quote do
@@ -30,8 +31,8 @@ defmodule Mnemonics.Reservoir.CompileHook do
         alias Mnemonics.Memory
 
         @doc false
-        @spec start_link(term) :: Supervisor.on_start()
-        def start_link(arg), do: Supervisor.start_link(__MODULE__, arg, name: __MODULE__)
+        @spec start_link(keyword) :: Supervisor.on_start()
+        def start_link(arg), do: Supervisor.start_link(__MODULE__, arg, name: arg[:name])
 
         @doc false
         @spec init([term]) :: {:ok, {:supervisor.sup_flags(), [:supervisor.child_spec()]}}
@@ -41,7 +42,10 @@ defmodule Mnemonics.Reservoir.CompileHook do
         Helper function to start DynamicSupervisor child for both Elixir 1.5 & 1.6.
         """
         @spec start_child(Memory.init_args()) :: Supervisor.on_start_child()
-        def start_child(memory_args), do: Supervisor.start_child(__MODULE__, [memory_args])
+        def start_child(arg) do
+          {sup_name, arg} = pop_in(arg[:sup_name])
+          Supervisor.start_child(Module.concat(sup_name, Reservoir), [arg])
+        end
       end
     end
   end
