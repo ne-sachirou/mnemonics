@@ -87,8 +87,8 @@ defmodule Mnemonics.Snap do
   @spec pop(t, atom) :: {table_snap, t}
   def pop(snap, table_name) do
     table_snap = snap[table_name]
-    snap = update_in(snap.versions, &Map.delete(&1, table_name))
-    snap = update_in(snap.cache, &Map.delete(&1, table_name))
+    {_, snap} = pop_in(snap.versions[table_name])
+    {_, snap} = pop_in(snap.cache[table_name])
     {table_snap, snap}
   end
 end

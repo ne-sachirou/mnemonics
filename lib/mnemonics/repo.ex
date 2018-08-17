@@ -56,11 +56,10 @@ defmodule Mnemonics.Repo do
   @spec handle_call({:load_table, module, atom, pos_integer}, GenServer.from(), t) ::
           {:reply, :ok | {:error, term}, t}
   def handle_call({:load_table, module, table_name, version}, _from, state) do
-    case Reservoir.start_child(
+    case Reservoir.start_child(state.sup_name,
            module: module,
            table_name: table_name,
            version: version,
-           sup_name: state.sup_name,
            ets_dir: state.ets_dir
          ) do
       {:ok, memory_pid} ->

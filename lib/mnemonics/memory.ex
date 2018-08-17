@@ -23,12 +23,8 @@ defmodule Mnemonics.Memory do
   defstruct tid: nil, pid: nil, module: nil, table_name: nil, version: 0
 
   @doc false
-  # For Elixir >= 1.6
   @spec start_link(term) :: GenServer.on_start()
   def start_link(arg), do: GenServer.start_link(__MODULE__, arg)
-  # For Elixir 1.5
-  @spec start_link(any, term) :: GenServer.on_start()
-  def start_link(_, arg), do: GenServer.start_link(__MODULE__, arg)
 
   @doc false
   @impl true

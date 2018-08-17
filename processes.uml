@@ -27,13 +27,13 @@ object "ETS" as memory2_1_ets {
   tid = tid3
 }
 
-Mnemonics <|-- Repo
-Mnemonics <|-- Reservoir
-Reservoir <|-- memory1_1
-memory1_1 <|-- memory1_1_ets
-Reservoir <|-- memory1_2
-memory1_2 <|-- memory1_2_ets
-Reservoir <|-- memory2_1
-memory2_1 <|-- memory2_1_ets
+Mnemonics <.. Repo
+Mnemonics <.. Reservoir
+Reservoir <.. memory1_1
+memory1_1 <.. memory1_1_ets
+Reservoir <.. memory1_2
+memory1_2 <.. memory1_2_ets
+Reservoir <.. memory2_1
+memory2_1 <.. memory2_1_ets
 
 @enduml

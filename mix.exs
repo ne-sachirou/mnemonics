@@ -9,8 +9,12 @@ defmodule Mnemonics.Mixfile do
       deps: deps(),
       description:
         "Read only data store for Elixir: fast, concurrently, for large data & hot reloadable.",
-      dialyzer: [ignore_warnings: "dialyzer.ignore-warnings"],
-      elixir: "~> 1.5",
+      dialyzer: [
+        flags: [:no_undefined_callbacks],
+        ignore_warnings: "dialyzer.ignore-warnings",
+        remove_defaults: [:unknown]
+      ],
+      elixir: "~> 1.6",
       elixirc_paths: elixirc_paths(Mix.env()),
       package: package(),
       preferred_cli_env: [
@@ -38,7 +42,7 @@ defmodule Mnemonics.Mixfile do
 
   defp deps do
     [
-      {:ex_doc, "~> 0.18", only: :dev, runtime: false},
+      {:ex_doc, "~> 0.19", only: :dev, runtime: false},
       {:fastglobal, "~> 1.0"},
       {:inner_cotton, github: "ne-sachirou/inner_cotton", only: [:dev, :test]}
     ]
