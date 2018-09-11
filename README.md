@@ -16,7 +16,7 @@ Add `mnemonics` to your list of dependencies in `mix.exs`.
 ```elixir
 def deps do
   [
-    {:mnemonics, "~> 0.3"}
+    {:mnemonics, "~> 0.4"}
   ]
 end
 ```

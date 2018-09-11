@@ -1,9 +1,9 @@
 language: elixir
-elixir:
-  - "1.6.6"
-  - "1.7.2"
-matrix:
+matrix: 
   exclude: []
-otp_release:
+elixir: 
+  - "1.6"
+  - "1.7"
+otp_release: 
   - "20.3"
   - "21.0"
