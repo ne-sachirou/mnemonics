@@ -88,7 +88,7 @@ defmodule Mnemonics do
                  _ -> false
                end
              ) do
-          nil -> raise "There's no table {#{unquote(table_name)}}, #{version}}."
+          nil -> raise "There's no table {#{unquote(table_name)}, #{version}}."
           memory -> memory
         end
       end
