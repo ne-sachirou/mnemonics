@@ -4,6 +4,7 @@ Read only data store for Elixir: fast, concurrently, for large data & hot reload
 
 [![Hex.pm](https://img.shields.io/hexpm/v/mnemonics.svg)](https://hex.pm/packages/mnemonics)
 [![Build Status](https://travis-ci.org/ne-sachirou/mnemonics.svg?branch=master)](https://travis-ci.org/ne-sachirou/mnemonics)
+[![Coverage Status](https://coveralls.io/repos/github/ne-sachirou/mnemonics/badge.svg)](https://coveralls.io/github/ne-sachirou/mnemonics)
 
 Mnemonics is analogous to Ruby's [ActiveHash](https://rubygems.org/gems/active_hash) in it's usecase.
 
