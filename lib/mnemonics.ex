@@ -46,13 +46,13 @@ defmodule Mnemonics do
       * `timeout:` Timeout ms (default 5000).
       """
       @spec load(pos_integer, keyword) :: :ok | {:error, term}
-      def load(version, opts \\ []),
-        do:
-          GenServer.call(
-            Module.concat(unquote(sup_name), Repo),
-            {:load_table, __MODULE__, unquote(table_name), version},
-            opts[:timeout] || 5000
-          )
+      def load(version, opts \\ []) do
+        GenServer.call(
+          Module.concat(unquote(sup_name), Repo),
+          {:load_table, __MODULE__, unquote(table_name), version},
+          opts[:timeout] || 5000
+        )
+      end
 
       @doc """
       Take version snapshot of the table.
