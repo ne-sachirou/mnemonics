@@ -1,23 +1,23 @@
-Mnemonics
-==
-Read only data store for Elixir: fast, concurrently, for large data & hot reloadable.
-
-[![Hex.pm](https://img.shields.io/hexpm/v/mnemonics.svg)](https://hex.pm/packages/mnemonics)
-[![Build Status](https://travis-ci.org/ne-sachirou/mnemonics.svg?branch=master)](https://travis-ci.org/ne-sachirou/mnemonics)
+[![Actions Status](https://github.com/ne-sachirou/mnemonics/workflows/test/badge.svg)](https://github.com/ne-sachirou/mnemonics/actions)
 [![Coverage Status](https://coveralls.io/repos/github/ne-sachirou/mnemonics/badge.svg)](https://coveralls.io/github/ne-sachirou/mnemonics)
+[![Hex.pm](https://img.shields.io/hexpm/v/mnemonics.svg)](https://hex.pm/packages/mnemonics)
+
+# Mnemonics
+
+Read only data store for Elixir: fast, concurrently, for large data & hot reloadable.
 
 Mnemonics is analogous to Ruby's [ActiveHash](https://rubygems.org/gems/active_hash) in it's usecase.
 
 [Document](https://hex.pm/docs/mnemonics).
 
-Installation
---
+## Installation
+
 Add `mnemonics` to your list of dependencies in `mix.exs`.
 
 ```elixir
 def deps do
   [
-    {:mnemonics, "~> 0.4"}
+    {:mnemonics, "~> 0.5"}
   ]
 end
 ```
@@ -39,8 +39,8 @@ defmodule Your.Application do
 end
 ```
 
-Usage
---
+## Usage
+
 Create an `example.ets` by `:ets.tab2file/3`. Then put it into the ets_dir. The `examples.ets` stores `{:example1, %{id: :example1}}`.
 
 ```
@@ -96,9 +96,11 @@ end)
 ```
 
 ### :ets.new/2 Option
-* Should `:public` or `:protected`. `:protected` (default) is recommended.
-* Can't `:named_table`.
-* `{:read_concurrency, true}` is recommended.
+
+- Should `:public` or `:protected`. `:protected` (default) is recommended.
+- Can't `:named_table`.
+- `{:read_concurrency, true}` is recommended.
 
 ## Architechture
+
 [![processes](./processes.png)](https://github.com/ne-sachirou/mnemonics/blob/master/processes.png)
