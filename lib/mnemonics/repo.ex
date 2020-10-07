@@ -28,8 +28,8 @@ defmodule Mnemonics.Repo do
   @impl true
   @spec init(keyword) :: {:ok, t}
   def init(arg) do
-    global_tables_key = FastGlobal.new(Module.concat(arg[:name], Tables))
-    FastGlobal.put(global_tables_key, @global_tables_default_value)
+    global_tables_key = Module.concat(arg[:name], Tables)
+    :persistent_term.put(global_tables_key, @global_tables_default_value)
     {:ok, %__MODULE__{sup_name: arg[:sup_name], ets_dir: arg[:ets_dir]}}
   end
 
@@ -39,15 +39,12 @@ defmodule Mnemonics.Repo do
   @spec tables(term) :: [Memory.t()]
   def tables(sup_name \\ Mnemonics)
 
-  def tables({FastGlobal, global_tables_key}),
-    do:
-      global_tables_key
-      |> FastGlobal.get(@global_tables_default_value)
-      |> :erlang.binary_to_term()
+  def tables({:persistent_term, global_tables_key}),
+    do: :persistent_term.get(global_tables_key, @global_tables_default_value)
 
-  def tables(sup_name), do: tables({FastGlobal, global_tables_key(sup_name)})
+  def tables(sup_name), do: tables({:persistent_term, global_tables_key(sup_name)})
 
-  def global_tables_key(sup_name), do: sup_name |> Module.concat(Repo.Tables) |> FastGlobal.new()
+  def global_tables_key(sup_name), do: Module.concat(sup_name, Repo.Tables)
 
   @doc """
   `:load_table` => Load a table of the table_name & version, then stop old ones.
@@ -71,8 +68,7 @@ defmodule Mnemonics.Repo do
             {old_tables, [memory | tables]}
           end)
 
-        # NOTE: FastGlobal can't put pid & reference.
-        FastGlobal.put(global_tables_key(state.sup_name), :erlang.term_to_binary(state.tables))
+        :persistent_term.put(global_tables_key(state.sup_name), state.tables)
 
         for memory <- old_tables do
           try do

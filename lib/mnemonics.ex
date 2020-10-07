@@ -69,7 +69,7 @@ defmodule Mnemonics do
       @spec table :: Mnemonics.Memory.t()
       def table do
         memories =
-          for memory <- Mnemonics.Repo.tables({FastGlobal, unquote(global_tables_key)}),
+          for memory <- Mnemonics.Repo.tables({:persistent_term, unquote(global_tables_key)}),
               memory.table_name == unquote(table_name),
               do: memory
 
@@ -82,7 +82,7 @@ defmodule Mnemonics do
       @spec table(pos_integer) :: Mnemonics.Memory.t()
       def table(version) do
         case Enum.find(
-               Mnemonics.Repo.tables({FastGlobal, unquote(global_tables_key)}),
+               Mnemonics.Repo.tables({:persistent_term, unquote(global_tables_key)}),
                fn
                  %{table_name: unquote(table_name), version: ^version} -> true
                  _ -> false
